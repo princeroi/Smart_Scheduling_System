@@ -102,5 +102,5 @@ if __name__ == '__main__':
     print("Server running on: http://localhost:3000")
     print("Send POST requests to: http://localhost:3000/generate-schedule")
     print("=" * 60)
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 3000))
     app.run(host='0.0.0.0', port=port)
