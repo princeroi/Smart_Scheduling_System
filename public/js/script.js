@@ -730,7 +730,7 @@ function generateAndSubmit() {
     // ===== UPDATED FETCH - NO ENCRYPTION =====
     const API_URL = window.location.hostname === "localhost"
         ? "http://localhost:3000"
-        : "https://scheduling-system-hi5w.onrender.com/generate-schedule";
+        : "https://scheduling-system-hi5w.onrender.com";
 
     fetch(`${API_URL}/generate-schedule`, {
         method: 'POST',
