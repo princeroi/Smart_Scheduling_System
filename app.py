@@ -4,6 +4,7 @@ import json
 import sys
 import io
 from contextlib import redirect_stdout
+import os
 
 # Import your scheduling algorithm
 from CSPxGA import generate_schedule_from_data
@@ -101,4 +102,5 @@ if __name__ == '__main__':
     print("Server running on: http://localhost:3000")
     print("Send POST requests to: http://localhost:3000/generate-schedule")
     print("=" * 60)
-    app.run(host='0.0.0.0', port=3000, debug=False, threaded=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
