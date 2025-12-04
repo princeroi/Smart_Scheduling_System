@@ -17,9 +17,7 @@ def index():
 
 @app.route('/generate-schedule', methods=['POST'])
 def generate_schedule():
-    """
-    Main endpoint for schedule generation with streaming progress
-    """
+
     @stream_with_context
     def generate():
         try:
