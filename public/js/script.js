@@ -5,18 +5,14 @@ let teacherAvailability = [];
 let rooms = [];
 const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-// Sidebar Navigation
 function switchTab(tabName) {
-    // Hide all sections
     document.getElementById('generate-section').style.display = 'none';
     document.getElementById('schedules-section').style.display = 'none';
     
-    // Remove active class from all menu items
     document.querySelectorAll('.sidebar-menu-item').forEach(item => {
         item.classList.remove('active');
     });
     
-    // Show selected section and activate menu item
     if (tabName === 'generate') {
         document.getElementById('generate-section').style.display = 'block';
         document.getElementById('menu-generate').classList.add('active');
@@ -26,99 +22,98 @@ function switchTab(tabName) {
     }
 }
 
-// Load Sample Data
 function loadSampleData() {
     document.getElementById('scheduleTitle').value = 'My School Schedule';
     document.getElementById('firstBreak').value = 60;
     document.getElementById('secondBreak').value = 60;
 
-    courses = [
-        { id: 1, courseCode: 'AASI 302', courseTitle: 'Auditing and Assurance: Specialized Industries', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
-        { id: 2, courseCode: 'ACCT 101', courseTitle: 'Financial Accounting', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
-        { id: 3, courseCode: 'MGMT 201', courseTitle: 'Principles of Management', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
-        { id: 4, courseCode: 'MKTG 210', courseTitle: 'Marketing Fundamentals', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
-        { id: 5, courseCode: 'ECON 102', courseTitle: 'Macroeconomics', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
-        { id: 6, courseCode: 'ACCT 202', courseTitle: 'Managerial Accounting', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
-        { id: 7, courseCode: 'IT 105', courseTitle: 'Computer Applications in Business', subjectType: 'LAB', units: '2', hoursPerWeek: 120, daysPerWeek: 1 },
-        { id: 8, courseCode: 'STAT 301', courseTitle: 'Business Statistics', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
-        { id: 9, courseCode: 'BUSLAW 110', courseTitle: 'Business Law and Ethics', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
+    const courses = [
+        { id: 1, courseCode: 'CS 101', courseTitle: 'Introduction to Computer Science', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
+        { id: 2, courseCode: 'IT 210', courseTitle: 'Web Development', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
+        { id: 3, courseCode: 'MATH 201', courseTitle: 'Calculus II', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
+        { id: 4, courseCode: 'ENG 102', courseTitle: 'Academic Writing', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
+        { id: 5, courseCode: 'PHY 101', courseTitle: 'General Physics I', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
+        { id: 6, courseCode: 'ACC 202', courseTitle: 'Managerial Accounting', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
+        { id: 7, courseCode: 'CS 150', courseTitle: 'Programming Fundamentals (Lab)', subjectType: 'LAB', units: '2', hoursPerWeek: 120, daysPerWeek: 1 },
+        { id: 8, courseCode: 'STAT 101', courseTitle: 'Introduction to Statistics', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
+        { id: 9, courseCode: 'BUS 110', courseTitle: 'Business Ethics', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
         { id: 10, courseCode: 'ENTR 101', courseTitle: 'Entrepreneurship', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 }
     ];
-
-    sections = [
-        { id: 1, sectionName: 'III-A1', sectionStudents: '30', courseCodes: 'AASI 302' },
-        { id: 2, sectionName: 'I-B2', sectionStudents: '35', courseCodes: 'ACCT 101' },
-        { id: 3, sectionName: 'II-C3', sectionStudents: '45', courseCodes: 'MGMT 201, ECON 102' },
-        { id: 4, sectionName: 'III-D1', sectionStudents: '40', courseCodes: 'ACCT 202, STAT 301' },
-        { id: 5, sectionName: 'I-A3', sectionStudents: '32', courseCodes: 'MKTG 210' },
-        { id: 6, sectionName: 'IV-B1', sectionStudents: '28', courseCodes: 'BUSLAW 110, ENTR 101' },
-        { id: 7, sectionName: 'II-A2', sectionStudents: '36', courseCodes: 'IT 105' }
+    
+    const sections = [
+        { id: 1, sectionName: 'ZX-A1', sectionStudents: '30', courseCodes: 'CS 101' },
+        { id: 2, sectionName: 'QW-B2', sectionStudents: '35', courseCodes: 'IT 210' },
+        { id: 3, sectionName: 'RT-C3', sectionStudents: '45', courseCodes: 'MATH 201, PHY 101' },
+        { id: 4, sectionName: 'YP-D1', sectionStudents: '40', courseCodes: 'ACC 202, STAT 101' },
+        { id: 5, sectionName: 'LP-A3', sectionStudents: '32', courseCodes: 'ENG 102' },
+        { id: 6, sectionName: 'MN-B1', sectionStudents: '28', courseCodes: 'BUS 110, ENTR 101' },
+        { id: 7, sectionName: 'JK-A2', sectionStudents: '36', courseCodes: 'CS 150' }
     ];
-
-    teacherLoads = [
-        { id: 1, fID: 'E_001', name: 'ABDON, MARK RONDOL', maxUnits: 3, courses: 'AASI 302' },
-        { id: 2, fID: 'E_002', name: 'SMITH, JOHN DOE', maxUnits: 6, courses: 'ACCT 101, AASI 302' },
-        { id: 3, fID: 'E_003', name: 'GARCIA, MARIA LOPEZ', maxUnits: 9, courses: 'MGMT 201, ENTR 101' },
-        { id: 4, fID: 'E_004', name: 'WILLIAMS, ROBERT', maxUnits: 6, courses: 'ECON 102, STAT 301' },
-        { id: 5, fID: 'E_005', name: 'CRUZ, ANA MARIE', maxUnits: 6, courses: 'ACCT 202' },
-        { id: 6, fID: 'E_006', name: 'KIM, STEVEN', maxUnits: 4, courses: 'IT 105' },
-        { id: 7, fID: 'E_007', name: 'REYES, LUIS MIGUEL', maxUnits: 6, courses: 'BUSLAW 110, MKTG 210' }
+    
+    const teacherLoads = [
+        { id: 1, fID: 'E_001', name: 'ZANDOR, LEX FERON', maxUnits: 3, courses: 'CS 101' },
+        { id: 2, fID: 'E_002', name: 'KRELL, JONAS PRIME', maxUnits: 6, courses: 'IT 210, CS 101' },
+        { id: 3, fID: 'E_003', name: 'VARIN, ELARA SYN', maxUnits: 9, courses: 'MATH 201, ENTR 101' },
+        { id: 4, fID: 'E_004', name: 'TORAN, RYKER VOSS', maxUnits: 6, courses: 'PHY 101, STAT 101' },
+        { id: 5, fID: 'E_005', name: 'MERIX, LUNA CREST', maxUnits: 6, courses: 'ACC 202' },
+        { id: 6, fID: 'E_006', name: 'HAYDEN, ZEK TERRA', maxUnits: 4, courses: 'CS 150' },
+        { id: 7, fID: 'E_007', name: 'RELDEN, MIRO KANE', maxUnits: 6, courses: 'BUS 110, ENG 102' }
     ];
-
-    teacherAvailability = [
+    
+    const teacherAvailability = [
         {
-            id: 1, fID: 'E_001', name: 'abdon, mark rondol', status: 'FULL-TIME',
-            schedules: [{ id: 1, days: ['MON', 'TUE', 'WED', 'THU', 'FRI'], startTime: 8, endTime: 17 }]
+            id: 1, fID: 'E_001', name: 'zandor, lex feron', status: 'FULL-TIME',
+            schedules: [{ id: 1, days: ['MON','TUE','WED','THU','FRI'], startTime: 8, endTime: 17 }]
         },
         {
-            id: 2, fID: 'E_002', name: 'smith, john doe', status: 'PART-TIME',
+            id: 2, fID: 'E_002', name: 'krell, jonas prime', status: 'PART-TIME',
             schedules: [
-                { id: 1, days: ['MON', 'WED', 'FRI'], startTime: 8, endTime: 12 },
-                { id: 2, days: ['TUE', 'THU'], startTime: 13, endTime: 17 }
+                { id: 1, days: ['MON','WED','FRI'], startTime: 8, endTime: 12 },
+                { id: 2, days: ['TUE','THU'], startTime: 13, endTime: 17 }
             ]
         },
         {
-            id: 3, fID: 'E_003', name: 'garcia, maria lopez', status: 'FULL-TIME',
+            id: 3, fID: 'E_003', name: 'varin, elara syn', status: 'FULL-TIME',
             schedules: [
-                { id: 1, days: ['MON', 'TUE'], startTime: 9, endTime: 16 },
-                { id: 2, days: ['THU', 'FRI'], startTime: 8, endTime: 15 }
+                { id: 1, days: ['MON','TUE'], startTime: 9, endTime: 16 },
+                { id: 2, days: ['THU','FRI'], startTime: 8, endTime: 15 }
             ]
         },
         {
-            id: 4, fID: 'E_004', name: 'williams, robert', status: 'PART-TIME',
-            schedules: [{ id: 1, days: ['WED', 'FRI'], startTime: 10, endTime: 17 }]
+            id: 4, fID: 'E_004', name: 'toran, ryker voss', status: 'PART-TIME',
+            schedules: [{ id: 1, days: ['WED','FRI'], startTime: 10, endTime: 17 }]
         },
         {
-            id: 5, fID: 'E_005', name: 'cruz, ana marie', status: 'FULL-TIME',
+            id: 5, fID: 'E_005', name: 'merix, luna crest', status: 'FULL-TIME',
             schedules: [
-                { id: 1, days: ['MON', 'THU'], startTime: 8, endTime: 12 },
-                { id: 2, days: ['TUE', 'WED'], startTime: 13, endTime: 17 }
+                { id: 1, days: ['MON','THU'], startTime: 8, endTime: 12 },
+                { id: 2, days: ['TUE','WED'], startTime: 13, endTime: 17 }
             ]
         },
         {
-            id: 6, fID: 'E_006', name: 'kim, steven', status: 'PART-TIME',
+            id: 6, fID: 'E_006', name: 'hayden, zek terra', status: 'PART-TIME',
             schedules: [{ id: 1, days: ['SAT'], startTime: 8, endTime: 17 }]
         },
         {
-            id: 7, fID: 'E_007', name: 'reyes, luis miguel', status: 'FULL-TIME',
-            schedules: [{ id: 1, days: ['MON', 'WED', 'FRI'], startTime: 8, endTime: 17 }]
+            id: 7, fID: 'E_007', name: 'relden, miro kane', status: 'FULL-TIME',
+            schedules: [{ id: 1, days: ['MON','WED','FRI'], startTime: 8, endTime: 17 }]
         }
     ];
-
-    rooms = [
-        { id: 1, roomName: 'Room 101', roomType: 'LECTURE', roomCapacity: '40' },
-        { id: 2, roomName: 'Room 102', roomType: 'LAB', roomCapacity: '30' },
-        { id: 3, roomName: 'Room 201', roomType: 'LECTURE', roomCapacity: '45' },
-        { id: 4, roomName: 'Room 202', roomType: 'LECTURE', roomCapacity: '50' },
-        { id: 5, roomName: 'Computer Lab A', roomType: 'LAB', roomCapacity: '25' },
-        { id: 6, roomName: 'Audio-Visual Room', roomType: 'LECTURE', roomCapacity: '60' },
-        { id: 7, roomName: 'Room 303', roomType: 'LECTURE', roomCapacity: '35' }
+    
+    const rooms = [
+        { id: 1, roomName: 'Room A1', roomType: 'LECTURE', roomCapacity: '40' },
+        { id: 2, roomName: 'Room B2', roomType: 'LAB', roomCapacity: '30' },
+        { id: 3, roomName: 'Room C3', roomType: 'LECTURE', roomCapacity: '45' },
+        { id: 4, roomName: 'Room D4', roomType: 'LECTURE', roomCapacity: '50' },
+        { id: 5, roomName: 'Lab Omega', roomType: 'LAB', roomCapacity: '25' },
+        { id: 6, roomName: 'Vision Hall', roomType: 'LECTURE', roomCapacity: '60' },
+        { id: 7, roomName: 'Room E5', roomType: 'LECTURE', roomCapacity: '35' }
     ];
+
 
     renderAll();
 }
 
-// Course Management
 function addCourse() {
     courses.push({ id: Date.now(), courseCode: '', courseTitle: '', subjectType: 'LECTURE', units: '', hoursPerWeek: '', daysPerWeek: '' });
     renderCourses();
@@ -154,7 +149,6 @@ function updateCourse(id, field, value) {
     if (course) course[field] = value;
 }
 
-// Section Management
 function addSection() {
     sections.push({ id: Date.now(), sectionName: '', sectionStudents: '', courseCodes: '' });
     renderSections();
@@ -182,7 +176,6 @@ function updateSection(id, field, value) {
     if (section) section[field] = value;
 }
 
-// Teacher Load Management
 function addTeacherLoad() {
     teacherLoads.push({ id: Date.now(), fID: '', name: '', maxUnits: '', courses: '' });
     renderTeacherLoads();
@@ -211,7 +204,6 @@ function updateTeacherLoad(id, field, value) {
     if (teacher) teacher[field] = value;
 }
 
-// Teacher Availability Management
 function addTeacherAvailability() {
     teacherAvailability.push({
         id: Date.now(),
@@ -346,7 +338,7 @@ function renderTeacherAvailability() {
     `).join('');
 }
 
-// Room Management
+
 function addRoom() {
     rooms.push({ id: Date.now(), roomName: '', roomType: 'LECTURE', roomCapacity: '' });
     renderRooms();
@@ -379,7 +371,6 @@ function updateRoom(id, field, value) {
     if (room) room[field] = value;
 }
 
-// Render All
 function renderAll() {
     renderCourses();
     renderSections();
@@ -388,10 +379,8 @@ function renderAll() {
     renderRooms();
 }
 
-// Initialize
 renderAll();
 
-// Schedule Generation Functions
 
 function generateHoursArray(start, end) {
     const hours = [];
@@ -472,7 +461,6 @@ function generateAndSubmit() {
     const errors = [];
     const warnings = [];
 
-    // Validation logic (same as before)
     if (!scheduleJSON.Title?.trim()) errors.push("Schedule Title is required");
     if (!scheduleJSON.firstBreakTime || scheduleJSON.firstBreakTime <= 0)
         errors.push("First Break must be greater than 0 minutes");
@@ -555,7 +543,6 @@ function generateAndSubmit() {
         });
     }
 
-    // Advanced validations
     const courseCodeMap = {};
     courses.forEach(c => {
         const code = c.courseCode?.trim().toUpperCase();
@@ -727,7 +714,6 @@ function generateAndSubmit() {
             <span>Starting schedule generation...</span>
         </div>`;
 
-    // ===== UPDATED FETCH - NO ENCRYPTION =====
     const API_URL = window.location.hostname === "localhost"
         ? "http://localhost:3000"
         : "https://scheduling-system-hi5w.onrender.com";
@@ -737,7 +723,7 @@ function generateAndSubmit() {
         headers: { 
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(scheduleJSON)  // Send directly as JSON
+        body: JSON.stringify(scheduleJSON)  
     })
     .then(response => {
         if (!response.ok) throw new Error('Server error: ' + response.status);
@@ -764,7 +750,6 @@ function generateAndSubmit() {
                         const message = line.replace('[PROGRESS]', '').trim();
                         addStatusMessage(message);
                         
-                        // Update progress based on messages
                         if (message.includes('initial population')) {
                             updateProgress(10, 'Creating initial population...');
                         } else if (message.includes('CSP schedule')) {
@@ -790,7 +775,6 @@ function generateAndSubmit() {
         return read();
     })
     .then(fullText => {
-        // Parse the JSON result (no decryption needed)
         let jsonResult = null;
         const lines = fullText.split('\n').reverse();
         
@@ -926,8 +910,6 @@ function displayScheduleResults(jsonResult) {
     displayRoomView(jsonResult.room_schedules || []);
     displayConflictsView(jsonResult);
 }
-
-// Display Functions for Schedule Results
 
 function displayScheduleView(schedules) {
     if (!schedules || schedules.length === 0) {
@@ -1318,7 +1300,6 @@ function displayConflictsView(jsonResult) {
         return;
     }
 
-    // DEBUG: Log all conflicts to see their structure
     console.log('=== ALL CONFLICTS ===');
     console.log(JSON.stringify(conflicts, null, 2));
     console.log('====================');
@@ -1368,17 +1349,14 @@ function displayConflictsView(jsonResult) {
     html += `<h5 class="mb-3"><i class="fas fa-list me-2"></i>Conflict Details</h5>`;
 
     conflicts.forEach((conflict, index) => {
-        // DEBUG: Log each conflict
         console.log(`Conflict #${index + 1}:`, conflict);
         console.log('Available keys:', Object.keys(conflict));
         
         const conflictType = conflict.type || 'Unknown Conflict';
         const message = conflict.message || 'No details available';
         
-        // Try to extract schedule from various possible locations
         let schedule = conflict.schedule || conflict.details || conflict;
-        
-        // If schedule is nested, try to extract it
+
         if (conflict.schedule1) schedule = conflict.schedule1;
         if (conflict.schedule_1) schedule = conflict.schedule_1;
         if (conflict.schedules && conflict.schedules.length > 0) schedule = conflict.schedules[0];
