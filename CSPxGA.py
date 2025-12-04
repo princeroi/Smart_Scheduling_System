@@ -453,7 +453,7 @@ def is_assignment_valid(assignment, current_schedule, teacher_info):
             if times_overlap(scheduled['time'], scheduled['duration'], 
                            assignment['time'], assignment['duration']):
                 return False
-ts
+                               
     for scheduled in current_schedule:
         if (scheduled['section'] == assignment['section'] and 
             scheduled['day'] == assignment['day']):
