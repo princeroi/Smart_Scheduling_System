@@ -45,8 +45,12 @@ function loadSampleData() {
         { id: 1, sectionName: 'ZX-A1', sectionStudents: '30', courseCodes: 'CS 101' },
         { id: 2, sectionName: 'QW-B2', sectionStudents: '35', courseCodes: 'IT 210' },
         { id: 3, sectionName: 'RT-C3', sectionStudents: '45', courseCodes: 'MATH 201, PHY 101' },
-        { id: 4, sectionName: 'YP-D1', sectionStudents: '40', courseCodes: 'ACC 202, STAT 101' }
+        { id: 4, sectionName: 'YP-D1', sectionStudents: '40', courseCodes: 'ACC 202, STAT 101' },
+        { id: 5, sectionName: 'LP-A3', sectionStudents: '32', courseCodes: 'ENG 102' },
+        { id: 6, sectionName: 'MN-B1', sectionStudents: '28', courseCodes: 'BUS 110, ENTR 101' },
+        { id: 7, sectionName: 'JK-A2', sectionStudents: '36', courseCodes: 'CS 150' }
     ];
+
 
     
     teacherLoads = [
