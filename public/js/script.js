@@ -46,7 +46,7 @@ function loadSampleData() {
         { id: 2, sectionName: 'QW-B2', sectionStudents: '35', courseCodes: 'IT 210' },
         { id: 3, sectionName: 'RT-C3', sectionStudents: '45', courseCodes: 'MATH 201, PHY 101' },
         { id: 4, sectionName: 'YP-D1', sectionStudents: '40', courseCodes: 'ACC 202, STAT 101' },
-        { id: 5, sectionName: 'LP-A3', sectionStudents: '32', courseCodes: 'ENG 102' },
+        { id: 5, sectionName: 'LP-A3', sectionStudents: '32', courseCodes: 'ENG 102' }
     ];
 
 
