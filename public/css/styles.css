@@ -1,6 +1,4 @@
-/* =====================================================
-   GLOBAL STYLES & VARIABLES
-   ===================================================== */
+
 :root {
     --primary-color: #4f46e5;
     --primary-dark: #4338ca;
@@ -45,9 +43,6 @@ body {
     overflow-x: hidden;
 }
 
-/* =====================================================
-   SIDEBAR STYLES
-   ===================================================== */
 .sidebar {
     position: fixed;
     top: 0;
@@ -153,9 +148,6 @@ body {
     transform: scale(1.15);
 }
 
-/* =====================================================
-   MAIN CONTENT
-   ===================================================== */
 .main-content {
     margin-left: var(--sidebar-width);
     padding: 40px;
@@ -182,9 +174,6 @@ body {
     margin: 0;
 }
 
-/* =====================================================
-   CARD STYLES
-   ===================================================== */
 .card {
     background: var(--bg-primary);
     border: none;
@@ -203,9 +192,6 @@ body {
     padding: 35px;
 }
 
-/* =====================================================
-   CONFIGURATION SECTION
-   ===================================================== */
 .config-section {
     background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
     border: 1px solid var(--border-color);
@@ -214,9 +200,6 @@ body {
     margin-bottom: 40px;
 }
 
-/* =====================================================
-   DATA SECTIONS
-   ===================================================== */
 .data-section {
     margin-bottom: 50px;
     padding: 30px;
@@ -251,9 +234,6 @@ body {
     color: var(--primary-color);
 }
 
-/* =====================================================
-   FORM CONTROLS
-   ===================================================== */
 .form-label {
     font-weight: 600;
     color: var(--text-primary);
@@ -281,9 +261,6 @@ body {
     color: var(--text-muted);
 }
 
-/* =====================================================
-   BUTTONS
-   ===================================================== */
 .btn {
     padding: 12px 24px;
     border-radius: var(--border-radius-sm);
@@ -425,9 +402,6 @@ body {
     border-top: 2px solid var(--border-color);
 }
 
-/* =====================================================
-   TABLE STYLES
-   ===================================================== */
 .table-responsive {
     border-radius: var(--border-radius-sm);
     overflow: hidden;
@@ -470,9 +444,6 @@ body {
     color: var(--text-primary);
 }
 
-/* =====================================================
-   MODAL STYLES
-   ===================================================== */
 .modal-content {
     border: none;
     border-radius: var(--border-radius);
@@ -513,9 +484,6 @@ body {
     background: var(--bg-secondary);
 }
 
-/* =====================================================
-   PROGRESS STYLES
-   ===================================================== */
 .progress-section {
     margin-bottom: 25px;
 }
@@ -557,9 +525,6 @@ body {
     overflow-y: auto;
 }
 
-/* =====================================================
-   TAB STYLES
-   ===================================================== */
 .nav-tabs {
     border-bottom: 2px solid var(--border-color);
     margin-bottom: 25px;
@@ -586,9 +551,6 @@ body {
     background: transparent;
 }
 
-/* =====================================================
-   EMPTY STATE
-   ===================================================== */
 .empty-state {
     text-align: center;
     padding: 80px 40px;
@@ -615,9 +577,6 @@ body {
     margin: 0;
 }
 
-/* =====================================================
-   STATUS MESSAGES
-   ===================================================== */
 .status-message {
     padding: 12px 16px;
     margin-bottom: 10px;
@@ -636,9 +595,6 @@ body {
     border-left-color: var(--warning-color);
 }
 
-/* =====================================================
-   CONFLICT STYLES
-   ===================================================== */
 .conflict-card {
     border-left: 4px solid var(--danger-color);
     background: #fef2f2;
@@ -671,9 +627,6 @@ body {
     text-align: center;
 }
 
-/* =====================================================
-   DAY & ENTITY SECTIONS
-   ===================================================== */
 .day-section, .teacher-section, .section-section, .room-section {
     border: 2px solid var(--border-color);
     border-radius: var(--border-radius);
@@ -733,9 +686,6 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-/* =====================================================
-   ANIMATIONS
-   ===================================================== */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -780,9 +730,6 @@ body {
     }
 }
 
-/* =====================================================
-   CUSTOM SCROLLBAR
-   ===================================================== */
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -803,9 +750,6 @@ body {
     background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary-color) 100%);
 }
 
-/* =====================================================
-   RESPONSIVE DESIGN
-   ===================================================== */
 @media (max-width: 1024px) {
     .main-content {
         padding: 30px;
