@@ -6,7 +6,6 @@ import io
 from contextlib import redirect_stdout
 import os
 
-# Import your scheduling algorithm
 from CSPxGA import generate_schedule_from_data
 
 app = Flask(__name__, static_folder='public', static_url_path='')
@@ -24,24 +23,20 @@ def generate_schedule():
     @stream_with_context
     def generate():
         try:
-            # Get JSON data from request
             json_data = request.get_json()
             
             if not json_data:
                 yield json.dumps({"error": "No JSON data received"}) + "\n"
                 return
-            
-            # Capture stdout to get progress messages
+
             output_buffer = io.StringIO()
-            
-            # Stream progress by capturing print statements
+
             class ProgressWriter:
                 def __init__(self):
                     self.buffer = []
                 
                 def write(self, text):
                     if text.strip():
-                        # Send progress immediately
                         self.buffer.append(f"[PROGRESS] {text.strip()}\n")
                 
                 def flush(self):
@@ -53,28 +48,22 @@ def generate_schedule():
                     return messages
             
             progress_writer = ProgressWriter()
-            
-            # Redirect stdout
+ 
             old_stdout = sys.stdout
             sys.stdout = progress_writer
             
             try:
-                # Send initial message
                 sys.stdout = old_stdout
                 yield "[PROGRESS] Starting schedule generation...\n"
                 sys.stdout = progress_writer
-                
-                # Call your scheduling function
+
                 result = generate_schedule_from_data(json_data)
-                
-                # Restore stdout
+
                 sys.stdout = old_stdout
-                
-                # Send any remaining progress messages
+
                 for msg in progress_writer.get_messages():
                     yield msg
-                
-                # Send final result
+
                 if result:
                     yield json.dumps(result) + "\n"
                 else:
