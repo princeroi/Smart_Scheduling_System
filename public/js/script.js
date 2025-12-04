@@ -27,7 +27,7 @@ function loadSampleData() {
     document.getElementById('firstBreak').value = 60;
     document.getElementById('secondBreak').value = 60;
 
-    const courses = [
+    courses = [
         { id: 1, courseCode: 'CS 101', courseTitle: 'Introduction to Computer Science', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
         { id: 2, courseCode: 'IT 210', courseTitle: 'Web Development', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
         { id: 3, courseCode: 'MATH 201', courseTitle: 'Calculus II', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
@@ -39,8 +39,9 @@ function loadSampleData() {
         { id: 9, courseCode: 'BUS 110', courseTitle: 'Business Ethics', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 },
         { id: 10, courseCode: 'ENTR 101', courseTitle: 'Entrepreneurship', subjectType: 'LECTURE', units: '3', hoursPerWeek: 180, daysPerWeek: 2 }
     ];
+
     
-    const sections = [
+    sections = [
         { id: 1, sectionName: 'ZX-A1', sectionStudents: '30', courseCodes: 'CS 101' },
         { id: 2, sectionName: 'QW-B2', sectionStudents: '35', courseCodes: 'IT 210' },
         { id: 3, sectionName: 'RT-C3', sectionStudents: '45', courseCodes: 'MATH 201, PHY 101' },
@@ -49,8 +50,9 @@ function loadSampleData() {
         { id: 6, sectionName: 'MN-B1', sectionStudents: '28', courseCodes: 'BUS 110, ENTR 101' },
         { id: 7, sectionName: 'JK-A2', sectionStudents: '36', courseCodes: 'CS 150' }
     ];
+
     
-    const teacherLoads = [
+    teacherLoads = [
         { id: 1, fID: 'E_001', name: 'ZANDOR, LEX FERON', maxUnits: 3, courses: 'CS 101' },
         { id: 2, fID: 'E_002', name: 'KRELL, JONAS PRIME', maxUnits: 6, courses: 'IT 210, CS 101' },
         { id: 3, fID: 'E_003', name: 'VARIN, ELARA SYN', maxUnits: 9, courses: 'MATH 201, ENTR 101' },
@@ -59,8 +61,9 @@ function loadSampleData() {
         { id: 6, fID: 'E_006', name: 'HAYDEN, ZEK TERRA', maxUnits: 4, courses: 'CS 150' },
         { id: 7, fID: 'E_007', name: 'RELDEN, MIRO KANE', maxUnits: 6, courses: 'BUS 110, ENG 102' }
     ];
+
     
-    const teacherAvailability = [
+    teacherAvailability = [
         {
             id: 1, fID: 'E_001', name: 'zandor, lex feron', status: 'FULL-TIME',
             schedules: [{ id: 1, days: ['MON','TUE','WED','THU','FRI'], startTime: 8, endTime: 17 }]
@@ -99,8 +102,9 @@ function loadSampleData() {
             schedules: [{ id: 1, days: ['MON','WED','FRI'], startTime: 8, endTime: 17 }]
         }
     ];
+
     
-    const rooms = [
+    rooms = [
         { id: 1, roomName: 'Room A1', roomType: 'LECTURE', roomCapacity: '40' },
         { id: 2, roomName: 'Room B2', roomType: 'LAB', roomCapacity: '30' },
         { id: 3, roomName: 'Room C3', roomType: 'LECTURE', roomCapacity: '45' },
@@ -109,6 +113,7 @@ function loadSampleData() {
         { id: 6, roomName: 'Vision Hall', roomType: 'LECTURE', roomCapacity: '60' },
         { id: 7, roomName: 'Room E5', roomType: 'LECTURE', roomCapacity: '35' }
     ];
+
 
 
     renderAll();
