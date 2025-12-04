@@ -1,16 +1,11 @@
-"""
-Schedule Generation System using CSP and Genetic Algorithm
-Modified for Flask Integration - No Encryption
-"""
+
 
 import json
 import sys
 import random
 from collections import defaultdict
 
-# ============================================================================
-# GLOBAL CONSTANTS
-# ============================================================================
+
 
 FIRST_BREAK_RANGE_START = 10
 FIRST_BREAK_RANGE_END = 13
@@ -18,7 +13,6 @@ SECOND_BREAK_RANGE_START = 17
 SECOND_BREAK_RANGE_END = 18
 BREAK_DURATION = 1
 
-# Day name normalization mapping
 DAY_MAPPING = {
     'MON': 'Mon', 'MONDAY': 'Mon', 'Mon': 'Mon',
     'TUE': 'Tue', 'TUESDAY': 'Tue', 'Tue': 'Tue',
@@ -28,7 +22,6 @@ DAY_MAPPING = {
     'SAT': 'Sat', 'SATURDAY': 'Sat', 'Sat': 'Sat'
 }
 
-# Time slots and mapping
 TIME_SLOTS = ["8AM", "9AM", "10AM", "11AM", "12PM", "1PM", "2PM", "3PM", "4PM", "5PM", "6PM", "7PM"]
 TIME_MAP = {
     "8AM": 8, "9AM": 9, "10AM": 10, "11AM": 11, 
@@ -36,18 +29,12 @@ TIME_MAP = {
     "4PM": 16, "5PM": 17, "6PM": 18, "7PM": 19
 }
 
-# Genetic Algorithm Parameters
 POPULATION_SIZE = 25
 GENERATIONS = 50
 CSP_INITIAL_POPULATION = 15
 ELITE_SIZE = 3
 MUTATION_RATE = 0.2
 
-# ============================================================================
-# GLOBAL VARIABLES (Set by main function)
-# ============================================================================
-
-# These will be populated when generate_schedule_from_data() is called
 title = ""
 firstbreak = 0
 secondbreak = 0
@@ -60,12 +47,8 @@ days = []
 time_slots = TIME_SLOTS
 time_map = TIME_MAP
 
-# ============================================================================
-# HELPER FUNCTIONS - TIME & SCHEDULE UTILITIES
-# ============================================================================
 
 def calculate_expected_schedules():
-    """Calculate total expected schedules based on courses and sections"""
     total_expected = 0
     expected_by_section = {}
 
@@ -83,7 +66,6 @@ def calculate_expected_schedules():
 
 
 def analyze_schedule_completeness(schedule):
-    """Analyze which schedules are created vs expected"""
     _, expected_by_section = calculate_expected_schedules()
 
     actual_by_section = {}
@@ -103,19 +85,16 @@ def analyze_schedule_completeness(schedule):
 
 
 def get_hours_per_session(course):
-    """Calculate hours per session for a course"""
     return course["units"] / course["days"]
 
 
 def times_overlap(start1, dur1, start2, dur2):
-    """Check if two time intervals overlap"""
     end1 = time_map[start1] + dur1
     end2 = time_map[start2] + dur2
     return (time_map[start1] < end2) and (time_map[start2] < end1)
 
 
 def calculate_end_time(start_time, duration):
-    """Calculate end time string from start time and duration"""
     start_hour = time_map[start_time]
     end_hour_float = start_hour + duration
     end_hour = int(end_hour_float)
@@ -138,7 +117,6 @@ def calculate_end_time(start_time, duration):
 
 
 def calculate_schedule_diversity(population):
-    """Calculate diversity metric to prevent premature convergence"""
     if not population:
         return 0.0
 
@@ -150,17 +128,12 @@ def calculate_schedule_diversity(population):
     unique_schedules = len(set(schedule_signatures))
     return unique_schedules / len(population)
 
-# ============================================================================
-# TEACHER MANAGEMENT FUNCTIONS
-# ============================================================================
 
 def get_all_teacher_ids():
-    """Get list of unique teacher IDs"""
     return list(set([t['teacher_id'] for t in teacher_load]))
 
 
 def get_teacher_info(teacher_id):
-    """Get complete teacher information by merging data from all sources"""
     load_info = next((l for l in teacher_load if l['teacher_id'] == teacher_id), None)
     if not load_info:
         return None
@@ -184,13 +157,11 @@ def get_teacher_info(teacher_id):
 
 
 def get_all_teachers_info():
-    """Get all teachers with complete information"""
     teacher_ids = get_all_teacher_ids()
     return [get_teacher_info(tid) for tid in teacher_ids]
 
 
 def is_teacher_available(teacher_info, day, start_time, duration):
-    """Check if teacher is available for the entire class duration"""
     if day not in teacher_info['availability']:
         return False
 
@@ -209,18 +180,14 @@ def is_teacher_available(teacher_info, day, start_time, duration):
 
 
 def teacher_can_teach_course(teacher_id, course_code):
-    """Check if a teacher has the course in their load"""
+
     teacher_info = next((t for t in teacher_load if t['teacher_id'] == teacher_id), None)
     if not teacher_info:
         return False
     return course_code in teacher_info['courses']
 
-# ============================================================================
-# BREAK MANAGEMENT & SCHEDULE UTILITIES
-# ============================================================================
 
 def has_continuous_schedule(schedule, entity_type, entity_id, day, start_hour, end_hour):
-    """Check if an entity (section/teacher) has continuous classes in a time range"""
     classes = [g for g in schedule if g[entity_type] == entity_id and g['day'] == day]
     if not classes:
         return False
@@ -237,7 +204,6 @@ def has_continuous_schedule(schedule, entity_type, entity_id, day, start_hour, e
 
 
 def get_break_assignments(schedule):
-    """Assign break times for each section and teacher on each day."""
     break_assignments = {}
     teachers_info = get_all_teachers_info()
 
@@ -245,13 +211,11 @@ def get_break_assignments(schedule):
         used_first_breaks = set()
         used_second_breaks = set()
 
-        # Section breaks
         for sec in sections_list:
             sec_classes = [g for g in schedule if g['section'] == sec['name'] and g['day'] == day]
             if not sec_classes:
                 continue
 
-            # First break
             valid_first_breaks = []
             for break_start in range(FIRST_BREAK_RANGE_START, FIRST_BREAK_RANGE_END):
                 has_conflict = False
@@ -271,7 +235,6 @@ def get_break_assignments(schedule):
             else:
                 break_assignments[('section', sec['name'], day, 'first')] = random.choice(range(FIRST_BREAK_RANGE_START, FIRST_BREAK_RANGE_END))
 
-            # Second break (if continuous afternoon schedule)
             if has_continuous_schedule(schedule, 'section', sec['name'], day, 13, 17):
                 valid_second_breaks = []
                 for break_start in range(SECOND_BREAK_RANGE_START, SECOND_BREAK_RANGE_END):
@@ -291,13 +254,11 @@ def get_break_assignments(schedule):
                 else:
                     break_assignments[('section', sec['name'], day, 'second')] = random.choice(range(SECOND_BREAK_RANGE_START, SECOND_BREAK_RANGE_END))
 
-        # Teacher breaks
         for tchr_info in teachers_info:
             tchr_classes = [g for g in schedule if g['teacher'] == tchr_info['id'] and g['day'] == day]
             if not tchr_classes:
                 continue
 
-            # First break
             valid_first_breaks = []
             for break_start in range(FIRST_BREAK_RANGE_START, FIRST_BREAK_RANGE_END):
                 has_conflict = False
@@ -317,7 +278,6 @@ def get_break_assignments(schedule):
             else:
                 break_assignments[('teacher', tchr_info['id'], day, 'first')] = random.choice(range(FIRST_BREAK_RANGE_START, FIRST_BREAK_RANGE_END))
 
-            # Second break (if continuous afternoon schedule)
             if has_continuous_schedule(schedule, 'teacher', tchr_info['id'], day, 13, 17):
                 valid_second_breaks = []
                 for break_start in range(SECOND_BREAK_RANGE_START, SECOND_BREAK_RANGE_END):
@@ -339,14 +299,8 @@ def get_break_assignments(schedule):
 
     return break_assignments
 
-# ============================================================================
-# ROOM MANAGEMENT FUNCTIONS
-# ============================================================================
 
 def get_valid_rooms_for_course(course_obj, section_name):
-    """
-    Get list of valid rooms for a course based on type and capacity.
-    """
     if course_obj['type'] == 'Online':
         return ['ONLINE']
     
@@ -356,13 +310,11 @@ def get_valid_rooms_for_course(course_obj, section_name):
     
     student_count = section.get('student_count', 30)
     
-    # Find rooms matching type and capacity
     valid_rooms = [
         r['room'] for r in rooms_list 
         if r['type'] == course_obj['type'] and r.get('capacity', 40) >= student_count
     ]
     
-    # Fallback: just match type if no capacity match
     if not valid_rooms:
         valid_rooms = [r['room'] for r in rooms_list if r['type'] == course_obj['type']]
     
@@ -370,9 +322,7 @@ def get_valid_rooms_for_course(course_obj, section_name):
 
 
 def get_random_valid_room(course_obj, section_name):
-    """
-    Get a random valid room for fallback assignments.
-    """
+
     valid_rooms = get_valid_rooms_for_course(course_obj, section_name)
     
     if valid_rooms:
@@ -383,24 +333,14 @@ def get_random_valid_room(course_obj, section_name):
     
     return 'NO ROOM'
 
-# ============================================================================
-# CSP SOLVER - Constraint Satisfaction Problem
-# ============================================================================
-
 def generate_csp_schedule():
-    """
-    Custom CSP solver using backtracking with constraint checking.
-    Replaces OR-Tools while maintaining all constraints.
-    """
     teachers_info = get_all_teachers_info()
     
     if not teachers_info or not days:
         return None
     
-    # Initialize schedule
     schedule = []
     
-    # Build assignment tasks
     tasks = []
     for sec in sections_list:
         for course_code in sec['courses']:
@@ -410,7 +350,6 @@ def generate_csp_schedule():
             
             qualified_teachers = [t for t in teachers_info if course_code in t['courses']]
             
-            # Handle no available teacher case
             if not qualified_teachers:
                 num_sessions = course_obj['days']
                 for session in range(num_sessions):
@@ -424,8 +363,7 @@ def generate_csp_schedule():
                         'duration': get_hours_per_session(course_obj)
                     })
                 continue
-            
-            # Add valid tasks
+
             num_sessions = course_obj['days']
             for session in range(num_sessions):
                 tasks.append({
@@ -435,17 +373,14 @@ def generate_csp_schedule():
                     'course_obj': course_obj,
                     'qualified_teachers': qualified_teachers
                 })
-    
-    # Shuffle tasks for randomization
+n
     random.shuffle(tasks)
-    
-    # Greedy assignment with constraint checking
+
     for task in tasks:
         assignment = find_valid_assignment(task, schedule, teachers_info)
         if assignment:
             schedule.append(assignment)
         else:
-            # Fallback: assign with potential conflicts (will be handled by GA)
             schedule.append({
                 'section': task['section'],
                 'course': task['course'],
@@ -460,22 +395,16 @@ def generate_csp_schedule():
 
 
 def find_valid_assignment(task, current_schedule, teachers_info):
-    """
-    Find a valid assignment for a task that satisfies all constraints.
-    """
     course_obj = task['course_obj']
     duration = get_hours_per_session(course_obj)
     section_name = task['section']
-    
-    # Get valid rooms
+
     valid_rooms = get_valid_rooms_for_course(course_obj, section_name)
     if not valid_rooms:
         valid_rooms = ['ONLINE' if course_obj['type'] == 'Online' else 'NO ROOM']
-    
-    # Shuffle to encourage variety
+
     random.shuffle(valid_rooms)
-    
-    # Try each teacher
+
     teachers = task['qualified_teachers'].copy()
     random.shuffle(teachers)
     
@@ -483,28 +412,23 @@ def find_valid_assignment(task, current_schedule, teachers_info):
         teacher_info = next((t for t in teachers_info if t['id'] == teacher['id']), None)
         if not teacher_info:
             continue
-        
-        # Try each day
+
         available_days = list(days)
         random.shuffle(available_days)
         
         for day in available_days:
-            # Check if teacher is available on this day
             if day not in teacher_info['availability']:
                 continue
             
             available_hours = teacher_info['availability'][day]
             
-            # Try each time slot
             time_slots_shuffled = time_slots.copy()
             random.shuffle(time_slots_shuffled)
             
             for time_slot in time_slots_shuffled:
-                # Check teacher availability for entire duration
                 if not is_teacher_available(teacher_info, day, time_slot, duration):
                     continue
                 
-                # Try each room
                 for room in valid_rooms:
                     assignment = {
                         'section': section_name,
@@ -516,7 +440,6 @@ def find_valid_assignment(task, current_schedule, teachers_info):
                         'duration': duration
                     }
                     
-                    # Check all constraints
                     if is_assignment_valid(assignment, current_schedule, teacher_info):
                         return assignment
     
@@ -524,26 +447,19 @@ def find_valid_assignment(task, current_schedule, teachers_info):
 
 
 def is_assignment_valid(assignment, current_schedule, teacher_info):
-    """
-    Check if an assignment violates any constraints.
-    """
-    # CONSTRAINT 1: No teacher time conflicts
     for scheduled in current_schedule:
         if (scheduled['teacher'] == assignment['teacher'] and 
             scheduled['day'] == assignment['day']):
             if times_overlap(scheduled['time'], scheduled['duration'], 
                            assignment['time'], assignment['duration']):
                 return False
-    
-    # CONSTRAINT 2: No section time conflicts
+ts
     for scheduled in current_schedule:
         if (scheduled['section'] == assignment['section'] and 
             scheduled['day'] == assignment['day']):
             if times_overlap(scheduled['time'], scheduled['duration'], 
                            assignment['time'], assignment['duration']):
                 return False
-    
-    # CONSTRAINT 3: No room conflicts (except ONLINE)
     if assignment['room'] not in ['ONLINE', 'NO ROOM']:
         for scheduled in current_schedule:
             if (scheduled['room'] == assignment['room'] and 
@@ -552,24 +468,18 @@ def is_assignment_valid(assignment, current_schedule, teacher_info):
                 if times_overlap(scheduled['time'], scheduled['duration'], 
                                assignment['time'], assignment['duration']):
                     return False
-    
-    # CONSTRAINT 4: Section daily hour limit (10 hours)
     section_day_hours = sum(
         s['duration'] for s in current_schedule 
         if s['section'] == assignment['section'] and s['day'] == assignment['day']
     )
     if section_day_hours + assignment['duration'] > 10:
         return False
-    
-    # CONSTRAINT 5: Teacher max units
     teacher_total_hours = sum(
         s['duration'] for s in current_schedule 
         if s['teacher'] == assignment['teacher']
     )
     if teacher_total_hours + assignment['duration'] > teacher_info['max_units']:
         return False
-    
-    # CONSTRAINT 6: Online courses unique day+time
     if assignment['room'] == 'ONLINE':
         for scheduled in current_schedule:
             if (scheduled['room'] == 'ONLINE' and 
@@ -579,17 +489,12 @@ def is_assignment_valid(assignment, current_schedule, teacher_info):
     
     return True
 
-# ============================================================================
-# CONFLICT DETECTION - Part A (Setup and Initial Checks)
-# ============================================================================
-
 def detect_conflicts(schedule):
     """Enhanced conflict detection with detailed reporting"""
     conflicts = []
     break_assignments = get_break_assignments(schedule)
     teachers_info = get_all_teachers_info()
 
-    # 1. Check for teacher-course mismatch (teacher doesn't have course in their load)
     for g in schedule:
         if g['teacher'] == 'NO AVAILABLE TEACHER':
             conflicts.append({
@@ -613,7 +518,6 @@ def detect_conflicts(schedule):
                 'message': f"Teacher {g['teacher']} is assigned to teach {g['course']} for section {g['section']}, but this course is not in their teaching load"
             })
 
-    # 2. Check teacher availability violations
     for g in schedule:
         if g['teacher'] == 'NO AVAILABLE TEACHER':
             continue
@@ -639,7 +543,6 @@ def detect_conflicts(schedule):
                 'message': f"Teacher {g['teacher']} availability violated: {g['course']} ({g['section']}) scheduled {g['day']} {g['time']}-{end_time}, but teacher available only {avail_str}"
             })
 
-    # 3. Check break violations
     for key, break_start in break_assignments.items():
         entity_type, entity_id, day, break_type = key
         break_end = break_start + BREAK_DURATION
@@ -673,13 +576,7 @@ def detect_conflicts(schedule):
                     'message': f"{entity_type.capitalize()} {entity_id} {break_type} break ({break_time_str}) violated by {g['course']} on {day} at {g['time']}-{end_time_str}"
                 })
 
-    return conflicts  # Part A returns, Part B continues below
-
-# ============================================================================
-# CONFLICT DETECTION - Part B (Overlaps and Resource Conflicts)
-# ============================================================================
-# NOTE: This continues the detect_conflicts() function from Part 7
-# Add this code after the "return conflicts" in Part 7
+    return conflicts  
 
 def detect_conflicts_part_b(schedule, conflicts):
     """
@@ -687,18 +584,15 @@ def detect_conflicts_part_b(schedule, conflicts):
     This should be called within detect_conflicts() after Part A checks
     """
     teachers_info = get_all_teachers_info()
-    
-    # 4. Check for overlaps (teacher, room, section)
+
     for i, g1 in enumerate(schedule):
         for j, g2 in enumerate(schedule):
             if i >= j:
                 continue
 
-            # Skip conflicts involving NO AVAILABLE TEACHER
             if g1['teacher'] == 'NO AVAILABLE TEACHER' or g2['teacher'] == 'NO AVAILABLE TEACHER':
                 continue
 
-            # Teacher overlap
             if g1["teacher"] == g2["teacher"] and g1["day"] == g2["day"]:
                 if times_overlap(g1["time"], g1["duration"], g2["time"], g2["duration"]):
                     end1 = calculate_end_time(g1['time'], g1['duration'])
@@ -715,7 +609,6 @@ def detect_conflicts_part_b(schedule, conflicts):
                         'message': f"Teacher {g1['teacher']} overlap on {g1['day']}: {g1['section']} {g1['course']} ({g1['time']}-{end1}) vs {g2['section']} {g2['course']} ({g2['time']}-{end2})"
                     })
 
-            # Room overlap
             if g1["room"] == g2["room"] and g1["room"] != "ONLINE" and g1["room"] != "NO ROOM" and g1["day"] == g2["day"]:
                 if times_overlap(g1["time"], g1["duration"], g2["time"], g2["duration"]):
                     end1 = calculate_end_time(g1['time'], g1['duration'])
@@ -732,7 +625,6 @@ def detect_conflicts_part_b(schedule, conflicts):
                         'message': f"Room {g1['room']} overlap on {g1['day']}: {g1['section']} {g1['course']} ({g1['time']}-{end1}) vs {g2['section']} {g2['course']} ({g2['time']}-{end2})"
                     })
 
-            # Section overlap
             if g1["section"] == g2["section"] and g1["day"] == g2["day"]:
                 if times_overlap(g1["time"], g1["duration"], g2["time"], g2["duration"]):
                     end1 = calculate_end_time(g1['time'], g1['duration'])
@@ -749,7 +641,6 @@ def detect_conflicts_part_b(schedule, conflicts):
                         'message': f"Section {g1['section']} overlap on {g1['day']}: {g1['course']} ({g1['time']}-{end1}, T:{g1['teacher']}, R:{g1['room']}) vs {g2['course']} ({g2['time']}-{end2}, T:{g2['teacher']}, R:{g2['room']})"
                     })
 
-    # 5. Online course conflicts
     online_courses = [g for g in schedule if g['room'] == 'ONLINE']
     for i, o1 in enumerate(online_courses):
         for o2 in online_courses[i+1:]:
@@ -767,7 +658,6 @@ def detect_conflicts_part_b(schedule, conflicts):
                     'message': f"Online courses conflict on {o1['day']} at {o1['time']}-{end1}: {o1['section']} {o1['course']} (T:{o1['teacher']}) vs {o2['section']} {o2['course']} (T:{o2['teacher']})"
                 })
 
-    # 6. Online/offline conflict for teachers
     for tchr_info in teachers_info:
         for day in days:
             online_courses = [g for g in schedule if g["teacher"] == tchr_info["id"] and g["day"] == day and g["room"] == "ONLINE"]
@@ -785,7 +675,6 @@ def detect_conflicts_part_b(schedule, conflicts):
                     'message': f"Teacher {tchr_info['id']} has online + offline courses on {day}: Online=[{online_list}], Offline=[{offline_list}]"
                 })
 
-    # 7. Online/offline conflict for sections
     for sec in sections_list:
         for day in days:
             online_courses = [g for g in schedule if g["section"] == sec["name"] and g["day"] == day and g["room"] == "ONLINE"]
@@ -805,18 +694,13 @@ def detect_conflicts_part_b(schedule, conflicts):
 
     return conflicts
 
-# ============================================================================
-# CONFLICT DETECTION - Part C (Capacity and Limit Checks)
-# ============================================================================
-
 def detect_conflicts_part_c(schedule, conflicts):
     """
     Final part of conflict detection - capacity and limits
     This should be called within detect_conflicts() after Part B
     """
     teachers_info = get_all_teachers_info()
-    
-    # 8. Section daily hour limit
+
     for sec in sections_list:
         for day in days:
             sec_classes = [g for g in schedule if g['section'] == sec['name'] and g['day'] == day]
@@ -835,7 +719,6 @@ def detect_conflicts_part_c(schedule, conflicts):
                         'message': f"Section {sec['name']} exceeds 10 hours on {day}: {total_hours:.1f} hours - Classes: [{class_list}]"
                     })
 
-    # 9. Teacher max units
     for tchr_info in teachers_info:
         tchr_classes = [g for g in schedule if g['teacher'] == tchr_info['id']]
         total_hours = sum(g['duration'] for g in tchr_classes)
@@ -854,7 +737,6 @@ def detect_conflicts_part_c(schedule, conflicts):
                     'message': f"Teacher {tchr_info['id']} exceeds max units: {total_hours:.1f}/{tchr_info['max_units']} hours - Classes: [{class_list}]"
                 })
 
-    # 10. Check room capacity violations
     for g in schedule:
         if g['room'] == 'ONLINE' or g['room'] == 'NO ROOM':
             continue
@@ -879,8 +761,7 @@ def detect_conflicts_part_c(schedule, conflicts):
                     'overage': student_count - room_capacity,
                     'message': f"Room {g['room']} capacity exceeded: {student_count} students in room with {room_capacity} capacity for {g['section']} {g['course']} on {g['day']} at {g['time']}"
                 })
-    
-    # 11. Check room type mismatch
+
     for g in schedule:
         if g['room'] == 'ONLINE' or g['room'] == 'NO ROOM':
             continue
@@ -909,15 +790,12 @@ def detect_conflicts_part_c(schedule, conflicts):
 
     return conflicts
 
-
-# COMBINED DETECT_CONFLICTS FUNCTION
 def detect_conflicts(schedule):
     """Main conflict detection function - combines all parts"""
     conflicts = []
     break_assignments = get_break_assignments(schedule)
     teachers_info = get_all_teachers_info()
 
-    # Part A: Initial checks
     for g in schedule:
         if g['teacher'] == 'NO AVAILABLE TEACHER':
             conflicts.append({
@@ -940,15 +818,10 @@ def detect_conflicts(schedule):
                 'message': f"Teacher {g['teacher']} is assigned to teach {g['course']} but this course is not in their teaching load"
             })
 
-    # Continue with Parts B and C
     conflicts = detect_conflicts_part_b(schedule, conflicts)
     conflicts = detect_conflicts_part_c(schedule, conflicts)
     
     return conflicts
-
-# ============================================================================
-# FITNESS CALCULATION
-# ============================================================================
 
 def calculate_fitness(schedule):
     """Enhanced fitness function with better weight distribution and room balance"""
@@ -958,7 +831,6 @@ def calculate_fitness(schedule):
     score = 0
     teachers_info = get_all_teachers_info()
 
-    # 1. CONFLICTS (most critical - heavily penalized)
     conflicts = detect_conflicts(schedule)
     conflict_types = {}
     for c in conflicts:
@@ -967,7 +839,6 @@ def calculate_fitness(schedule):
             conflict_types[ctype] = 0
         conflict_types[ctype] += 1
 
-    # Different penalties for different conflict types
     score -= conflict_types.get('teacher_overlap', 0) * 2000
     score -= conflict_types.get('section_overlap', 0) * 2000
     score -= conflict_types.get('room_overlap', 0) * 1500
@@ -982,7 +853,6 @@ def calculate_fitness(schedule):
     score -= conflict_types.get('teacher_course_mismatch', 0) * 3000
     score -= conflict_types.get('no_available_teacher', 0) * 5000
 
-    # 2. TEACHER AVAILABILITY (bonus for compliance)
     for g in schedule:
         if g['teacher'] == 'NO AVAILABLE TEACHER':
             continue
@@ -990,7 +860,6 @@ def calculate_fitness(schedule):
         if teacher_info and is_teacher_available(teacher_info, g['day'], g['time'], g['duration']):
             score += 100
 
-    # 3. BREAK TIME COMPLIANCE (bonus for proper breaks)
     break_assignments = get_break_assignments(schedule)
     for key, break_start in break_assignments.items():
         entity_type, entity_id, day, break_type = key
@@ -1015,13 +884,11 @@ def calculate_fitness(schedule):
         if not has_violation:
             score += 150
 
-    # 4. TIME DISTRIBUTION (prefer balanced distribution)
     time_usage = {slot: sum(1 for g in schedule if g['time'] == slot) for slot in time_slots}
     if time_usage:
         time_std = (max(time_usage.values()) - min(time_usage.values()))
         score -= time_std * 15
 
-    # 5. TEACHER WORKLOAD BALANCE
     teacher_hours = {t['id']: 0 for t in teachers_info}
     for g in schedule:
         if g['teacher'] != 'NO AVAILABLE TEACHER':
@@ -1032,7 +899,6 @@ def calculate_fitness(schedule):
             workload_diff = max(workload_values) - min(workload_values)
             score -= workload_diff * 30
 
-    # 6. CONTIGUOUS TIME BLOCKS (prefer consecutive classes)
     for sec in sections_list:
         for day in days:
             day_classes = sorted([g for g in schedule if g['section'] == sec['name'] and g['day'] == day],
@@ -1048,7 +914,6 @@ def calculate_fitness(schedule):
                 elif gap > 2:
                     score -= gap * 5
 
-    # 7. EARLY TIME PREFERENCE (prefer morning classes)
     for g in schedule:
         hour = time_map[g['time']]
         if hour <= 10:
@@ -1056,7 +921,6 @@ def calculate_fitness(schedule):
         elif hour >= 17:
             score -= 3
 
-    # 8. DAY DISTRIBUTION (prefer classes spread across days)
     for sec in sections_list:
         for course_code in sec['courses']:
             course_classes = [g for g in schedule if g['section'] == sec['name'] and g['course'] == course_code]
@@ -1065,7 +929,6 @@ def calculate_fitness(schedule):
             if course_obj and unique_days == course_obj['days']:
                 score += 25
 
-    # 9. ROOM DISTRIBUTION (prefer balanced room usage)
     room_usage = {}
     for g in schedule:
         if g['room'] not in ['ONLINE', 'NO ROOM']:
@@ -1075,8 +938,7 @@ def calculate_fitness(schedule):
         usage_values = list(room_usage.values())
         room_balance = max(usage_values) - min(usage_values)
         score -= room_balance * 10
-        
-        # Bonus for using more rooms
+
         unique_rooms_used = len(room_usage)
         total_available_rooms = len([r for r in rooms_list if r['type'] != 'Online'])
         if total_available_rooms > 0:
@@ -1085,9 +947,6 @@ def calculate_fitness(schedule):
 
     return score
 
-# ============================================================================
-# GENETIC ALGORITHM
-# ============================================================================
 
 def run_genetic_algorithm():
     """
@@ -1099,7 +958,6 @@ def run_genetic_algorithm():
     print("Generating initial population using CSP...")
     sys.stdout.flush()
 
-    # Phase 1: Generate initial population
     for i in range(CSP_INITIAL_POPULATION):
         print(f"Generating CSP schedule {i+1}/{CSP_INITIAL_POPULATION}...")
         sys.stdout.flush()
@@ -1112,7 +970,6 @@ def run_genetic_algorithm():
             print(f"Failed to generate schedule {i+1}")
             sys.stdout.flush()
 
-    # Fallback if no schedules generated
     if len(population) == 0:
         print("No CSP schedules generated, creating fallback schedule...")
         sys.stdout.flush()
@@ -1120,7 +977,6 @@ def run_genetic_algorithm():
         if fallback_schedule:
             population.append(fallback_schedule)
 
-    # Fill population to required size
     if len(population) < POPULATION_SIZE and len(population) > 0:
         attempts = 0
         max_attempts = POPULATION_SIZE * 3
@@ -1152,7 +1008,6 @@ def run_genetic_algorithm():
     print("Starting genetic algorithm optimization...")
     sys.stdout.flush()
 
-    # Phase 2: Genetic Algorithm
     for g in range(GENERATIONS):
         scored = []
         for s in population:
@@ -1186,7 +1041,6 @@ def run_genetic_algorithm():
         else:
             stagnation_counter += 1
 
-        # Selection and Reproduction
         elite = [s for f, s in scored[:ELITE_SIZE]]
         top_performers = [s for f, s in scored[:POPULATION_SIZE // 2]]
         new_pop = elite.copy()
@@ -1194,7 +1048,6 @@ def run_genetic_algorithm():
         while len(new_pop) < POPULATION_SIZE:
             p1, p2 = random.sample(top_performers, 2)
 
-            # Crossover
             if len(p1) >= 4:
                 point1 = random.randint(1, len(p1) // 3)
                 point2 = random.randint(2 * len(p1) // 3, len(p1) - 1)
@@ -1205,7 +1058,6 @@ def run_genetic_algorithm():
 
             child = [dict(g) for g in child]
 
-            # Mutation
             effective_mutation_rate = MUTATION_RATE
             if stagnation_counter > 10:
                 effective_mutation_rate = min(0.4, MUTATION_RATE * 1.5)
@@ -1234,7 +1086,7 @@ def run_genetic_algorithm():
                                         other_rooms = [r for r in valid_rooms if r != gene['room']]
                                         if other_rooms:
                                             gene['room'] = random.choice(other_rooms)
-                        else:  # 'both'
+                        else: 
                             gene["time"] = random.choice(time_slots)
                             gene["day"] = random.choice(days)
 
@@ -1244,8 +1096,7 @@ def run_genetic_algorithm():
 
     print("Finalizing best schedule...")
     sys.stdout.flush()
-
-    # Find best schedule
+    
     if not all_generation_bests:
         if population:
             scored = [(calculate_fitness(s), s) for s in population if s]
@@ -1315,9 +1166,6 @@ def create_fallback_schedule():
     
     return fallback_schedule if fallback_schedule else None
 
-# ============================================================================
-# OUTPUT PREPARATION
-# ============================================================================
 
 def prepare_output(best_schedule, best_fitness, all_generation_bests):
     """Prepare final JSON output"""
@@ -1366,7 +1214,6 @@ def prepare_output(best_schedule, best_fitness, all_generation_bests):
         else:
             conflict_free_schedule.append(schedule_entry)
 
-    # Teacher schedules
     teacher_schedules = {}
     for teacher_info in get_all_teachers_info():
         tid = teacher_info['id']
@@ -1390,7 +1237,6 @@ def prepare_output(best_schedule, best_fitness, all_generation_bests):
                     'duration': g['duration']
                 })
 
-    # Section schedules
     section_schedules = {}
     for sec in sections_list:
         section_classes = [g for g in best_schedule if g['section'] == sec['name']]
@@ -1412,7 +1258,6 @@ def prepare_output(best_schedule, best_fitness, all_generation_bests):
                     'duration': g['duration']
                 })
 
-    # Room schedules
     room_schedules = {}
     for room in rooms_list:
         room_classes = [g for g in best_schedule if g['room'] == room['room']]
@@ -1475,10 +1320,6 @@ def prepare_output(best_schedule, best_fitness, all_generation_bests):
     return output
 
 
-# ============================================================================
-# MAIN FUNCTION - Called by Flask
-# ============================================================================
-
 def generate_schedule_from_data(json_data):
     """
     Main entry point called by Flask server
@@ -1488,7 +1329,6 @@ def generate_schedule_from_data(json_data):
     global courses, rooms_list, sections_list, days, time_slots, time_map
     
     try:
-        # Extract and normalize data
         title = json_data["Title"]
         firstbreak = float(json_data["firstBreakTime"])
         secondbreak = float(json_data["secondBreakTime"])
@@ -1497,8 +1337,7 @@ def generate_schedule_from_data(json_data):
         rooms = json_data["RoomInfo"]
         subjects = json_data["Subject"]
         sections = json_data["Section"]
-        
-        # Normalize teacher availability
+
         normalized_teacher_availability = {}
         for tid, tdata in teacher_availability_dict.items():
             normalized_avail = {}
@@ -1513,8 +1352,7 @@ def generate_schedule_from_data(json_data):
             }
         
         teacher_availability_dict = normalized_teacher_availability
-        
-        # Convert to list format
+
         teacher_load = []
         for tid, tdata in teachers_dict.items():
             teacher_load.append({
@@ -1558,8 +1396,7 @@ def generate_schedule_from_data(json_data):
                 'courses': sec['courseCodes'],
                 'student_count': int(sec.get('sectionStudents', 30))
             })
-        
-        # Extract days
+
         days = []
         for teacher_data in teacher_availability:
             for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']:
@@ -1571,8 +1408,7 @@ def generate_schedule_from_data(json_data):
         
         time_slots = TIME_SLOTS
         time_map = TIME_MAP
-        
-        # Run the algorithm
+
         print("Starting schedule generation...")
         sys.stdout.flush()
         
