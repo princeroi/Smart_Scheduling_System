@@ -373,7 +373,7 @@ def generate_csp_schedule():
                     'course_obj': course_obj,
                     'qualified_teachers': qualified_teachers
                 })
-n
+                
     random.shuffle(tasks)
 
     for task in tasks:
